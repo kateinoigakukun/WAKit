@@ -45,10 +45,9 @@ extension Runtime {
             let tableInstance = store.tables[Int(element.index)]
             let offset = try Int(execute(element.offset, resultType: I32.self).rawValue)
             let end = offset + element.initializer.count
-            guard
-                tableInstance.elements.indices.contains(offset),
-                tableInstance.elements.indices.contains(end)
-            else { throw Trap.tableOutOfRange }
+            guard tableInstance.elements.indices.overlaps(offset ..< end) else {
+                throw Trap.tableOutOfRange
+            }
             tableInstance.elements.replaceSubrange(offset ..< end, with: element.initializer.map { instance.functionAddresses[Int($0)] })
         }
 
